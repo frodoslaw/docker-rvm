@@ -27,7 +27,7 @@ ENV DEFAULT_RUBY 2.3.0
 ENV RUBIES 2.1.8 2.3.0 2.4.0
 
 RUN /bin/bash -l -c 'rvm requirements'
-RUN for RUBY in $RUBIES; do /bin/bash -l -c rvm install $RUBY; done
+RUN for RUBY in $RUBIES; /root/.rbenv/bin/rbenv install $RUBY; done
 RUN /bin/bash -l -c 'rvm use $RUBY_VERSION --default'
 
 # Install Bundler
