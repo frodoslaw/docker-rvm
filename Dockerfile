@@ -22,11 +22,12 @@ RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A170311380
     && curl -sSL https://get.rvm.io | bash -s stable \
     && /bin/bash -l -c 'source ~/.rvm/scripts/rvm'
 
-ENV RUBY_VERSION 2.3.0
-
 # Install Ruby
+ENV DEFAULT_RUBY 2.3.0
+ENV RUBIES="2.1.8 2.3.0 2.4.0"
+
 RUN /bin/bash -l -c 'rvm requirements'
-RUN /bin/bash -l -c 'rvm install $RUBY_VERSION'
+RUN for RUBY in $RUBIES; do /bin/bash -l -c 'rvm install $RUBY'; done
 RUN /bin/bash -l -c 'rvm use $RUBY_VERSION --default'
 
 # Install Bundler
