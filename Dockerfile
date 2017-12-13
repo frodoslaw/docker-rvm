@@ -6,7 +6,8 @@ USER root
 # Update
 RUN apt-get update \
     && apt-get upgrade -y \
-    && apt-get install curl -y
+    && apt-get install curl -y \
+    && apt-get install -y ruby ruby-dev
 
 # Setup User "worker"
 RUN useradd --home /home/worker -M worker -K UID_MIN=10000 -K GID_MIN=10000 -s /bin/bash
