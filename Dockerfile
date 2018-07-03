@@ -24,10 +24,11 @@ RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A170311380
     && /bin/bash -l -c 'source ~/.rvm/scripts/rvm'
 
 # Install Ruby
-ENV DEFAULT_RUBY 2.3.0
+ENV DEFAULT_RUBY 2.4.0
 
 RUN /bin/bash -l -c 'rvm requirements'
 RUN /bin/bash -l -c "rvm install 2.0.0"
+RUN /bin/bash -l -c "rvm install 2.1.0"
 RUN /bin/bash -l -c "rvm install 2.1.8"
 RUN /bin/bash -l -c "rvm install 2.2.0"
 RUN /bin/bash -l -c "rvm install 2.3.0"
