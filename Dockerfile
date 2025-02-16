@@ -11,7 +11,6 @@ RUN apt-get update \
 # Setup User "worker"
 RUN useradd --home /home/worker -M worker -K UID_MIN=10000 -K GID_MIN=10000 -s /bin/bash
 RUN mkdir /home/worker
-RUN useradd -ms /home/worker worker && chown -R worker /home/worker
 RUN echo 'worker ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER worker
