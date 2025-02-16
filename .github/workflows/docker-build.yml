@@ -3,11 +3,10 @@ name: Build and Scan Docker Images
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
-  workflow_dispatch:
+      - master
 
 jobs:
   build-and-scan:
