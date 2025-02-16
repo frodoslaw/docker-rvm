@@ -25,14 +25,10 @@ RUN curl -sSL https://get.rvm.io | bash -s stable
 # Set RVM environment for all users
 RUN echo 'source /etc/profile.d/rvm.sh' >> /etc/bash.bashrc
 
-# Install multiple Ruby versions
-RUN /bin/bash -c "source /etc/profile.d/rvm.sh && \
-    for version in 2.7.8 3.0.6 3.1.4; do \
-        rvm install $version; \
-    done && \
-    rvm use 3.1.4 --default"
+# Install multiple Ruby versions using a login shell
+RUN /bin/bash -lc "for version in 2.7.8 3.0.6 3.1.4; do rvm install $version; done && rvm use 3.1.4 --default"
 
 # Verify installation
-RUN /bin/bash -c "source /etc/profile.d/rvm.sh && rvm list"
+RUN /bin/bash -lc "rvm list"
 
 CMD ["/bin/bash"]
