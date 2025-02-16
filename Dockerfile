@@ -1,37 +1,34 @@
-FROM ubuntu:24.04
+# Use the latest Ubuntu as the base image
+FROM ubuntu:latest
 
-USER root
+# Set environment variables to avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Update
-RUN apt-get update \
-    && apt-get upgrade -y \
-    && apt-get install curl -y \
-    && apt-get install -y ruby ruby-dev
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg2 \
+    build-essential \
+    libssl-dev \
+    libreadline-dev \
+    zlib1g-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Setup User "worker"
-RUN useradd --home /home/worker -M worker -K UID_MIN=10000 -K GID_MIN=10000 -s /bin/bash
-RUN mkdir /home/worker
-RUN echo 'worker ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+# Install RVM (Ruby Version Manager)
+RUN curl -sSL https://get.rvm.io | bash -s stable
 
-USER worker
+# Load RVM and install multiple Ruby versions
+RUN /bin/bash -c "source /etc/profile.d/rvm.sh && \
+    rvm install 2.7.8 && \
+    rvm install 3.0.6 && \
+    rvm install 3.1.4 && \
+    rvm use 3.1.4 --default"
 
-# Install RVM
-RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB \
-    && curl -sSL https://get.rvm.io | bash -s stable \
-    && /bin/bash -l -c 'source ~/.rvm/scripts/rvm'
+# Set RVM environment for all users
+RUN echo 'source /etc/profile.d/rvm.sh' >> /etc/bash.bashrc
 
-# Install Ruby
-ENV DEFAULT_RUBY 2.4.0
+# Verify installation
+RUN /bin/bash -c "source /etc/profile.d/rvm.sh && rvm list"
 
-RUN /bin/bash -l -c 'rvm requirements'
-RUN /bin/bash -l -c "rvm install 2.0.0"
-RUN /bin/bash -l -c "rvm install 2.1.0"
-RUN /bin/bash -l -c "rvm install 2.1.8"
-RUN /bin/bash -l -c "rvm install 2.2.0"
-RUN /bin/bash -l -c "rvm install 2.3.0"
-RUN /bin/bash -l -c "rvm install 2.4.0"
-RUN /bin/bash -l -c "rvm install 2.5.0"
-RUN /bin/bash -l -c 'rvm use $DEFAULT_RUBY --default'
-
-# Install Bundler
-RUN /bin/bash -l -c 'gem install bundler --no-doc --no-ri'
+CMD ["/bin/bash"]
