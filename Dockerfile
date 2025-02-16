@@ -1,34 +1,34 @@
-# Use the latest Ubuntu as the base image
-FROM ubuntu:latest
+FROM ubuntu:20.04
 
-# Set environment variables to avoid interactive prompts
-ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install curl gnupg -y
+    
+# Download and import GPG keys required for RVM
+RUN gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB || \
+    (curl -sSL https://rvm.io/mpapis.asc | gpg --import - && \
+    curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -)
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    gnupg2 \
-    dirmngr \
-    build-essential \
-    libssl-dev \
-    libreadline-dev \
-    zlib1g-dev \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+# Download RVM installer script
+RUN curl -sSL https://get.rvm.io -o rvm-installer
 
-# Import RVM GPG keys
-RUN gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+# Install RVM
+RUN bash rvm-installer
 
-# Install RVM (Ruby Version Manager)
-RUN curl -sSL https://get.rvm.io | bash -s stable
-
-# Set RVM environment for all users
+# Source RVM scripts
 RUN echo 'source /etc/profile.d/rvm.sh' >> /etc/bash.bashrc
 
-# Install multiple Ruby versions using a login shell
-RUN /bin/bash -lc "for version in 2.7.8 3.0.6 3.1.4; do rvm install $version; done && rvm use 3.1.4 --default"
+# Reload shell for RVM
+SHELL ["/bin/bash", "-l", "-c"]
 
-# Verify installation
-RUN /bin/bash -lc "rvm list"
+RUN rvm get stable --autolibs=enable
 
-CMD ["/bin/bash"]
+RUN usermod -a -G rvm root
+
+RUN rvm --version
+
+RUN for version in 3.0.1 3.1.0 3.2.0 3.3.0 3.4.0 3.4.2; do \
+    rvm install ruby-"$version"; \
+    done
+
+RUN rvm --default use ruby-3.4.2
